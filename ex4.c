@@ -49,15 +49,17 @@ static int store_value(int val)
 	 * Otherwise (e.g., memory allocation failure),
 	 * return corresponding error code in error.h (e.g., -ENOMEM).
 	 */
-
-	if(entry *e1 = malloc(sizeof(*e1)) != NULL)
+	struct entry *e1 = kmalloc(sizeof(*e1), GFP_KERNEL);
+	if(e1 == NULL)
 	{
-		el->val = val;
+		return ENOMEM;
+	}
+	else 
+	{
+		e1->val = val;
+		list_add_tail(&e1->list, &mylist);
 		return 0;
 	}
-	else {return ENOMEM;}
-	
-
 }
 
 static void test_linked_list(void)
@@ -65,6 +67,15 @@ static void test_linked_list(void)
 	/* [X7: point 10]
 	 * Print out value of all entries in mylist.
 	 */
+	//temp variable
+	struct list_head p;
+	struct entry  *current_entry;
+	list_for_each_entry(current_entry, &mylist, list) 
+	{
+ 		printk(KERN_INFO "Val: %d\n", current_entry->val);
+	}
+
+
 }
 
 
@@ -73,6 +84,14 @@ static void destroy_linked_list_and_free(void)
 	/* [X8: point 10]
 	 * Free all entries in mylist.
 	 */
+	struct entry *current_entry, *next;
+	list_for_each_entry_safe(current_entry, next, mylist, list) 
+	{
+ 		printk(KERN_INFO "Val: %d\n", current_entry->val);
+ 		list_del(current_entry->list);
+ 		kfree(current_entry); 
+	}
+
 }
 
 
@@ -84,6 +103,8 @@ static int parse_params(void)
 
 	/* [X9: point 1]
 	 * Explain following in here.
+	 * This copies and allocates memory for the argument string contained in int_str,
+	 * if it can't be allocated, returns an error. Then orig is set to point at that string.
 	 */
 	params = kstrdup(int_str, GFP_KERNEL);
 	if (!params)
@@ -92,12 +113,16 @@ static int parse_params(void)
 
 	/* [X10: point 1]
 	 * Explain following in here.
+	 * Strsep extracts tokes from strings, and returns a pointer to that token. So this loop executes as long
+	 * as there are tokens to still be extracted. 
 	 */
 	while ((p = strsep(&params, ",")) != NULL) {
 		if (!*p)
 			continue;
 		/* [X11: point 1]
 		 * Explain following in here.
+		 * This takes to token previously extracted and converts it into an integer, and stores it in val. The return value is 
+		 * stored into err. It returns 0 on success, so if it returns something else, the loop breaks. 
 		 */
 		err = kstrtoint(p, 0, &val);
 		if (err)
@@ -105,6 +130,8 @@ static int parse_params(void)
 
 		/* [X12: point 1]
 		 * Explain following in here.
+		 * This calls the function that was defined before, it creates a list entry with the value val. It returns 0 upon success, so
+		 * if it returns something else, the loop breaks.
 		 */
 		err = store_value(val);
 		if (err)
@@ -113,6 +140,8 @@ static int parse_params(void)
 
 	/* [X13: point 1]
 	 * Explain following in here.
+	 * This frees the memory assoicated with the pointer orig, and returns err. err should be 0 if everything was 
+	 * successful, or some other error value otherwise. 
 	 */
 	kfree(orig);
 	return err;
@@ -122,6 +151,7 @@ static void run_tests(void)
 {
 	/* [X14: point 1]
 	 * Explain following in here.
+	 * This calls the function that was defined previously, and prints out all of the elements in the list.
 	 */
 	test_linked_list();
 }
@@ -130,6 +160,8 @@ static void cleanup(void)
 {
 	/* [X15: point 1]
 	 * Explain following in here.
+	 * This calls another function that was defined previously, is destroys all entries in the linked list and frees all
+	 * memory associated with it. It also prints an info message notifying that the list is being cleaned. 
 	 */
 	printk(KERN_INFO "\nCleaning up...\n");
 
@@ -142,6 +174,8 @@ static int __init ex4_init(void)
 
 	/* [X16: point 1]
 	 * Explain following in here.
+	 * This checks if the proper arguments have been passed, and prints an error message and returns an error value if they 
+	 * have not.
 	 */
 	if (!int_str) {
 		printk(KERN_INFO "Missing \'int_str\' parameter, exiting\n");
@@ -150,6 +184,8 @@ static int __init ex4_init(void)
 
 	/* [X17: point 1]
 	 * Explain following in here.
+	 * This attempts to parse the parameter strings into integers.
+	 * If unsucessful, the program jumps to exit code. 
 	 */
 	err = parse_params();
 	if (err)
@@ -157,11 +193,15 @@ static int __init ex4_init(void)
 
 	/* [X18: point 1]
 	 * Explain following in here.
+	 * This runs the previously defined function, where all members of the list are
+	 * printed out. 
 	 */
 	run_tests();
 out:
 	/* [X19: point 1]
 	 * Explain following in here.
+	 * This piece of code calls cleanup(), which deletes every element in the list and frees all memory, 
+	 * and then returns an error value. 
 	 */
 	cleanup();
 	return err;
@@ -171,16 +211,21 @@ static void __exit ex4_exit(void)
 {
 	/* [X20: point 1]
 	 * Explain following in here.
+	 * This function is to be called at the end of the module, and it dosen't need
+	 * to do anything since everything has been cleaned up so it returns nothing. 
 	 */
 	return;
 }
 
 /* [X21: point 1]
  * Explain following in here.
+ * This defines the begining of the module, 
+ * which calls the initializing function, which executes the purpose of the module.
  */
 module_init(ex4_init);
 
 /* [X22: point 1]
  * Explain following in here.
+ * This defines the end of the module, which calls an exiting function. This function returns nothing. 
  */
 module_exit(ex4_exit);
