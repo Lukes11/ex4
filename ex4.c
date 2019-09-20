@@ -10,7 +10,7 @@ static char *int_str;
  * List information about new module
  */
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("[YOUR NAME]");
+MODULE_AUTHOR("Luke Sanyour");
 MODULE_DESCRIPTION("LKP Exercise 4");
 
 /* [X2: point 1]
@@ -38,7 +38,7 @@ static LIST_HEAD(mylist);
 struct entry {
 	int val;
 	struct list_head list;
-} 
+};
 
 static int store_value(int val)
 {
@@ -67,10 +67,8 @@ static void test_linked_list(void)
 	/* [X7: point 10]
 	 * Print out value of all entries in mylist.
 	 */
-	//temp variable
-	struct list_head p;
 	struct entry  *current_entry;
-	list_for_each_entry(current_entry, &mylist, list) 
+	list_for_each_entry(current_entry, &mylist, list)
 	{
  		printk(KERN_INFO "Val: %d\n", current_entry->val);
 	}
@@ -85,10 +83,9 @@ static void destroy_linked_list_and_free(void)
 	 * Free all entries in mylist.
 	 */
 	struct entry *current_entry, *next;
-	list_for_each_entry_safe(current_entry, next, mylist, list) 
-	{
- 		printk(KERN_INFO "Val: %d\n", current_entry->val);
- 		list_del(current_entry->list);
+	list_for_each_entry_safe(current_entry, next, &mylist, list) 
+        {
+ 		list_del(&current_entry->list);
  		kfree(current_entry); 
 	}
 
