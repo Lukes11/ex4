@@ -23,7 +23,7 @@ struct entry {
 	int val;
 	struct list_head list;
 };
-
+static char[50] linkedList;
 static int store_value(int val)
 { 
 	struct entry *e1 = kmalloc(sizeof(*e1), GFP_KERNEL);
@@ -39,7 +39,7 @@ static int store_value(int val)
 	}
 }
 
-static char* test_linked_list(void)
+static void test_linked_list(void)
 {
 	
 	struct entry  *current_entry;
@@ -50,7 +50,7 @@ static char* test_linked_list(void)
 	{
 		sprintf(structureValues,"%d, ", current_entry->val);
 	}
-	return structureValues;
+	strcpy(linkedList, structureValues);
 }
 
 
@@ -142,7 +142,7 @@ static void __exit ex4_exit(void)
 
 //Create proc entry
 static int structures_proc_show(struct seq_file *m, void *v) {
-  seq_printf(m, "%s\n", test_linked_list());
+  seq_printf(m, "%s\n", linkedList);
   return 0;
 }
 
