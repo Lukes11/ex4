@@ -3,6 +3,7 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/seq_file.h>
+#include <linux/proc_fs.h>
 
 static char *int_str;
 
@@ -23,7 +24,7 @@ struct entry {
 	int val;
 	struct list_head list;
 };
-static char[50] linkedList;
+static char linkedList[50];
 static int store_value(int val)
 { 
 	struct entry *e1 = kmalloc(sizeof(*e1), GFP_KERNEL);
