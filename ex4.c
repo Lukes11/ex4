@@ -113,6 +113,23 @@ static void cleanup(void)
 	destroy_linked_list_and_free();
 }
 
+//Create proc entry
+static int structures_proc_show(struct seq_file *m, void *v) {
+  seq_printf(m, "%s\n", linkedList);
+  return 0;
+}
+
+static int structures_proc_open(struct inode *inode, struct  file *file) {
+  return single_open(file, structures_proc_show, NULL);
+}
+static const struct file_operations structures_proc_fops = {
+  .owner = THIS_MODULE,
+  .open = structures_proc_open,
+  .read = seq_read,
+  .llseek = seq_lseek,
+  .release = single_release,
+};
+//end proc entry
 static int __init ex4_init(void)
 {
 	int err = 0;
@@ -129,46 +146,20 @@ static int __init ex4_init(void)
 
 	
 	run_tests();
+	proc_create("structures_proc", 0, NULL, &structures_proc_fops);
 out:
 	
 	cleanup();
 	return err;
 }
+
 static void __exit ex4_exit(void)
 {
 	return;
-}
-
-//Create proc entry
-static int structures_proc_show(struct seq_file *m, void *v) {
-  seq_printf(m, "%s\n", linkedList);
-  return 0;
-}
-
-static int structures_proc_open(struct inode *inode, struct  file *file) {
-  return single_open(file, structures_proc_show, NULL);
-}
-
-static const struct file_operations structures_proc_fops = {
-  .owner = THIS_MODULE,
-  .open = structures_proc_open,
-  .read = seq_read,
-  .llseek = seq_lseek,
-  .release = single_release,
-};
-
-static int __init structures_proc_init(void) {
-  proc_create("structures_proc", 0, NULL, &structures_proc_fops);
-  return 0;
-}
-
-static void __exit structures_proc_exit(void) {
-  remove_proc_entry("structures_proc", NULL);
+	remove_proc_entry("structures_proc", NULL);
 }
 
 //exit module
 module_init(ex4_init);
-module_init(structures_proc_init);
-
 module_exit(ex4_exit);
-module_exit(structure_proc_exit);
+
