@@ -129,7 +129,6 @@ static int __init ex4_init(void)
 
 	
 	run_tests();
-	structures_proc_init();
 out:
 	
 	cleanup();
@@ -137,7 +136,6 @@ out:
 }
 static void __exit ex4_exit(void)
 {
-	structures_proc_exit();
 	return;
 }
 
@@ -170,5 +168,7 @@ static void __exit structures_proc_exit(void) {
 
 //exit module
 module_init(ex4_init);
+module_init(structures_proc_init);
 
 module_exit(ex4_exit);
+module_exit(structure_proc_exit);
