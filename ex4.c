@@ -49,7 +49,7 @@ static void test_linked_list(void)
 	sprintf(structureValues, "%s", name);
 	list_for_each_entry(current_entry, &mylist, list)
 	{
-		sprintf(structureValues,"%d, ", current_entry->val);
+		sprintf(structureValues + strlen(structureValues),"%d, ", current_entry->val);
 	}
 	strcpy(linkedList, structureValues);
 }
