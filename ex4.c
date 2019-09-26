@@ -30,13 +30,13 @@ struct hashEntry {
 	int val;
 	struct hlist_node hash_list;
 };
-static char linkedList[50];
+static char linkedList[50], hashTable[50];
 static int store_value(int val)
 { 
 	struct entry *le1 = kmalloc(sizeof(*le1), GFP_KERNEL);
-	struct hashEntry *he1 = kmalloc(sizeof(*hel), GFP_+KERNEL);
+	struct hashEntry *he1 = kmalloc(sizeof(*he1), GFP_KERNEL);
 	//add to linked list
-	if(e1 == NULL)
+	if(le1 == NULL || he1 == NULL)
 	{
 		return ENOMEM;
 	}
@@ -45,7 +45,7 @@ static int store_value(int val)
 		le1->val = val;
 		list_add_tail(&le1->list, &mylist);
 		he1->val = val;
-		hash_add(myHashTable, &he1.next, he1->val); 
+		hash_add(myHashTable, &he1->hash_list, he1->val); 
 
 		return 0;
 	}
@@ -67,13 +67,17 @@ static void test_linked_list(void)
 	{
 		sprintf(structureValues + strlen(structureValues),"%d, ", current_entry->val);
 	}
+	printk(KERN_INFO "%s\n", structureValues);
 	strcpy(linkedList, structureValues);
 	strcpy(structureValues, "");
 	strcpy(name, "Hash Table: ");
-	hash_for_each_entry(myHashTable, bkt, current_hash_entry, next)
+	sprintf(structureValues, "%s", name);
+	hash_for_each(myHashTable, bkt, current_hash_entry, hash_list)
 	{
 		sprintf(structureValues + strlen(structureValues),"%d, ", current_hash_entry->val);
 	}
+	printk(KERN_INFO "%s\n", structureValues);
+	strcpy(hashTable, structureValues);
 
 }
 
@@ -138,7 +142,7 @@ static void cleanup(void)
 
 //Create proc entry
 static int structures_proc_show(struct seq_file *m, void *v) {
-  seq_printf(m, "%s\n", linkedList);
+  seq_printf(m, "%s\n%s\n", linkedList, hashTable);
   return 0;
 }
 
