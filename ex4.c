@@ -129,7 +129,7 @@ static int __init ex4_init(void)
 
 	
 	run_tests();
-	proc_create("structures_proc", 0, NULL, &structures_proc_fops)
+	structures_proc_init();
 out:
 	
 	cleanup();
@@ -137,7 +137,7 @@ out:
 }
 static void __exit ex4_exit(void)
 {
-	remove_proc_entry("structures_proc", NULL);
+	structures_proc_exit();
 	return;
 }
 
@@ -158,6 +158,15 @@ static const struct file_operations structures_proc_fops = {
   .llseek = seq_lseek,
   .release = single_release,
 };
+
+static int __init structures_proc_init(void) {
+  proc_create("structures_proc", 0, NULL, &structures_proc_fops);
+  return 0;
+}
+
+static void __exit structures_proc_exit(void) {
+  remove_proc_entry("structures_proc", NULL);
+}
 
 //exit module
 module_init(ex4_init);
