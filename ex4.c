@@ -4,6 +4,7 @@
 #include <linux/slab.h>
 #include <linux/seq_file.h>
 #include <linux/proc_fs.h>
+#include <linux/hashtable.h>
 
 static char *int_str;
 
@@ -19,23 +20,33 @@ MODULE_PARM_DESC(int_str, "A comma-separated list of integers");
 
 
 static LIST_HEAD(mylist);
+static DEFINE_HASHTABLE(myHashTable, 5);
 
 struct entry {
 	int val;
 	struct list_head list;
 };
+struct hashEntry {
+	int val;
+	struct hlist_node hash_list;
+};
 static char linkedList[50];
 static int store_value(int val)
 { 
-	struct entry *e1 = kmalloc(sizeof(*e1), GFP_KERNEL);
+	struct entry *le1 = kmalloc(sizeof(*le1), GFP_KERNEL);
+	struct hashEntry *he1 = kmalloc(sizeof(*hel), GFP_+KERNEL);
+	//add to linked list
 	if(e1 == NULL)
 	{
 		return ENOMEM;
 	}
 	else 
 	{
-		e1->val = val;
-		list_add_tail(&e1->list, &mylist);
+		le1->val = val;
+		list_add_tail(&le1->list, &mylist);
+		he1->val = val;
+		hash_add(myHashTable, &he1.next, he1->val); 
+
 		return 0;
 	}
 }
@@ -46,12 +57,24 @@ static void test_linked_list(void)
 	struct entry  *current_entry;
 	char structureValues[50];
 	char name[20] = "Linked List: ";
+
+	int bkt; //hash bucket iterator
+	struct hashEntry *current_hash_entry;
+
 	sprintf(structureValues, "%s", name);
+
 	list_for_each_entry(current_entry, &mylist, list)
 	{
 		sprintf(structureValues + strlen(structureValues),"%d, ", current_entry->val);
 	}
 	strcpy(linkedList, structureValues);
+	strcpy(structureValues, "");
+	strcpy(name, "Hash Table: ");
+	hash_for_each_entry(myHashTable, bkt, current_hash_entry, next)
+	{
+		sprintf(structureValues + strlen(structureValues),"%d, ", current_hash_entry->val);
+	}
+
 }
 
 
