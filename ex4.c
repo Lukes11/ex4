@@ -6,6 +6,7 @@
 #include <linux/proc_fs.h>
 #include <linux/hashtable.h>
 #include <linux/radix-tree.h>
+#include <linux/xarray.h>
 
 static char *int_str;
 
@@ -30,6 +31,8 @@ struct my_rb_tree {
 static struct my_rb_tree tree;
 //define radix tree
 RADIX_TREE(myRadixTree, GFP_KERNEL);
+//define XArray
+DEFINE_XARRAY(myXArray);
 
 //list entry
 struct entry {
@@ -51,6 +54,9 @@ struct radEntry {
 	int key;
 	int val;
 };
+//to keep track of current index in xArray
+static unsigned long xArrIndex  = 0;
+
 static char linkedList[50], hashTable[50], redBlackTree[50], radixTree[50];
 //function to insert a value into the rb tree
 static void rb_insert_entry(struct my_rb_tree *root, struct rbEntry *en)
@@ -96,6 +102,8 @@ static int store_value(int val)
 		rad1->val = val;
 		rad1->key = val + 1;
 		radix_tree_insert(&myRadixTree, rad1->key, &rad1->val);
+		//add to XArray
+		xa_store(&myXArray, xArrIndex, &val);
 		return 0;
 	}
 }
@@ -151,6 +159,18 @@ static void test_linked_list(void)
 	}
 	printk(KERN_INFO "%s\n", structureValues);
 	strcpy(radixTree, structureValues);
+	//get string for xArray
+	strcpy(structureValues, "");
+	strcpy(name, "XArray: ");
+	sprintf(structureValues, "%s", name);
+	for(i = 0; i < xArrIndex; i++)
+	{
+		sprintf(structureValues + strlen(structureValues), "%d, ", xa_load(&myXArray, i);	
+	}
+	printk(KERN_INFO "%s\n", structureValues);
+
+
+
 
 
 }
