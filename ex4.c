@@ -102,13 +102,15 @@ static int store_value(int val)
 
 static void test_linked_list(void)
 {
-	
+
 	struct entry  *current_entry;
 	char structureValues[50];
 	char name[20] = "Linked List: ";
 	int bkt; 
 	struct hashEntry *current_hash_entry;
 	struct rb_node *node;
+	void **slot;
+	struct radix_tree_iter iter;
 
 	//get string for linked list
 	sprintf(structureValues, "%s", name);
@@ -134,26 +136,36 @@ static void test_linked_list(void)
 	sprintf(structureValues, "%s", name);
 	for (node = rb_last(&(tree.root_node)); node; node = rb_prev(node))
 	{
-      	sprintf(structureValues + strlen(structureValues), "%d, ", rb_entry(node, struct rbEntry, run_node)->val);
+		sprintf(structureValues + strlen(structureValues), "%d, ", rb_entry(node, struct rbEntry, run_node)->val);
 	}
 	printk(KERN_INFO "%s\n", structureValues);
 	strcpy(redBlackTree, structureValues);
+	//get string for radix tree
+	strcpy(structureValues, "");
+	strcpy(name, "Radix Tree: ");
+	sprintf(structureValues, "%s", name);
+	radix_tree_for_each_slot(slot, &myRadixTree, &iter, 0)
+	{
+		sprintf(structureValues + strlen(structureValues), "%d, ", slot);
+	}
+	printk(KERN_INFO "%s\n", structureValues);
+
 
 }
 
 
 static void destroy_linked_list_and_free(void)
 {
-	
+
 	struct entry *current_entry, *next;
 	struct hashEntry *current_hash_entry;
 	struct rb_node *node;
 	int bkt;
 	//delete linked list
 	list_for_each_entry_safe(current_entry, next, &mylist, list) 
-        {
- 		list_del(&current_entry->list);
- 		kfree(current_entry); 
+	{
+		list_del(&current_entry->list);
+		kfree(current_entry); 
 	}
 	//delete hash table
 	hash_for_each(myHashTable, bkt, current_hash_entry, hash_list)
@@ -165,7 +177,7 @@ static void destroy_linked_list_and_free(void)
 	{
 		rb_erase(node, &(tree.root_node));
 	}
-	
+
 
 }
 
@@ -176,28 +188,28 @@ static int parse_params(void)
 	char *p, *orig, *params;
 
 
-	
+
 	params = kstrdup(int_str, GFP_KERNEL);
 	if (!params)
 		return -ENOMEM;
 	orig = params;
 
-	
+
 	while ((p = strsep(&params, ",")) != NULL) {
 		if (!*p)
 			continue;
-		
+
 		err = kstrtoint(p, 0, &val);
 		if (err)
 			break;
 
-		
+
 		err = store_value(val);
 		if (err)
 			break;
 	}
 
-	
+
 	kfree(orig);
 	return err;
 }
@@ -209,7 +221,7 @@ static void run_tests(void)
 
 static void cleanup(void)
 {
-	
+
 	printk(KERN_INFO "\nCleaning up...\n");
 
 	destroy_linked_list_and_free();
@@ -217,19 +229,19 @@ static void cleanup(void)
 
 //Create proc entry
 static int structures_proc_show(struct seq_file *m, void *v) {
-  seq_printf(m, "%s\n%s\n%s\n", linkedList, hashTable, redBlackTree);
-  return 0;
+	seq_printf(m, "%s\n%s\n%s\n", linkedList, hashTable, redBlackTree);
+	return 0;
 }
 
 static int structures_proc_open(struct inode *inode, struct  file *file) {
-  return single_open(file, structures_proc_show, NULL);
+	return single_open(file, structures_proc_show, NULL);
 }
 static const struct file_operations structures_proc_fops = {
-  .owner = THIS_MODULE,
-  .open = structures_proc_open,
-  .read = seq_read,
-  .llseek = seq_lseek,
-  .release = single_release,
+	.owner = THIS_MODULE,
+	.open = structures_proc_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = single_release,
 };
 //end proc entry
 static int __init ex4_init(void)
@@ -241,17 +253,17 @@ static int __init ex4_init(void)
 		printk(KERN_INFO "Missing \'int_str\' parameter, exiting\n");
 		return -1;
 	}
-	
-	
+
+
 	err = parse_params();
 	if (err)
 		goto out;
 
-	
+
 	run_tests();
 	proc_create("structures_proc", 0, NULL, &structures_proc_fops);
 out:
-	
+
 	cleanup();
 	return err;
 }
