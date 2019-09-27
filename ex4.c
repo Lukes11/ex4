@@ -81,7 +81,8 @@ static int store_value(int val)
 		he1->val = val;
 		hash_add(myHashTable, &he1->hash_list, he1->val);
 		rb1->val = val;
-		rb_insert_entry(tree, rb1); 
+		rb_insert_entry(&tree, rb1); 
+
 		return 0;
 	}
 }
