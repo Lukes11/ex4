@@ -146,7 +146,8 @@ static void test_linked_list(void)
 	sprintf(structureValues, "%s", name);
 	radix_tree_for_each_slot(slot, &myRadixTree, &iter, 0)
 	{
-		sprintf(structureValues + strlen(structureValues), "%d, ", slot);
+		void* radVal = radix_tree_deref_slot(slot);
+		sprintf(structureValues + strlen(structureValues), "%d, ", *(int *) radVal);
 	}
 	printk(KERN_INFO "%s\n", structureValues);
 
