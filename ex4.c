@@ -137,6 +137,7 @@ static void destroy_linked_list_and_free(void)
 	
 	struct entry *current_entry, *next;
 	struct hashEntry *current_hash_entry;
+	struct rb_node *node;
 	int bkt;
 	//delete linked list
 	list_for_each_entry_safe(current_entry, next, &mylist, list) 
@@ -149,6 +150,12 @@ static void destroy_linked_list_and_free(void)
 	{
 		hash_del(&current_hash_entry->hash_list);
 	}
+	//delete rb tree
+	for (node = rb_last(&(tree.root_node)); node; node = rb_prev(node))
+	{
+		rb_erase(node, &(tree.root_node));
+	}
+	
 
 }
 
