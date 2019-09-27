@@ -5,6 +5,7 @@
 #include <linux/seq_file.h>
 #include <linux/proc_fs.h>
 #include <linux/hashtable.h>
+#include <linux/radix-tree.h>
 
 static char *int_str;
 
@@ -26,8 +27,9 @@ static DEFINE_HASHTABLE(myHashTable, 5);
 struct my_rb_tree {
 	struct rb_root root_node;
 };
-
 static struct my_rb_tree tree;
+//define radix tree
+RADIX_TREE(myRadixTree, GFP_KERNEL);
 
 //list entry
 struct entry {
@@ -44,6 +46,11 @@ struct rbEntry {
 	int val;
 	struct rb_node run_node;
 };
+//radix entry
+struct radEntry {
+	int key;
+	int val;
+}
 static char linkedList[50], hashTable[50], redBlackTree[50];
 //function to insert a value into the rb tree
 static void rb_insert_entry(struct my_rb_tree *root, struct rbEntry *en)
@@ -69,6 +76,7 @@ static int store_value(int val)
 	struct entry *le1 = kmalloc(sizeof(*le1), GFP_KERNEL);
 	struct hashEntry *he1 = kmalloc(sizeof(*he1), GFP_KERNEL);
 	struct rbEntry *rb1 =  kmalloc(sizeof(*rb1), GFP_KERNEL);
+	struct radEntry *rad1 =  kmalloc(sizeof(*rad1), GFP_KERNEL);
 	if(le1 == NULL || he1 == NULL || rb1 == NULL)
 	{
 		return ENOMEM;
@@ -84,7 +92,10 @@ static int store_value(int val)
 		//add to red black tree
 		rb1->val = val;
 		rb_insert_entry(&tree, rb1); 
-
+		//add to radix tree
+		rad1->val = val;
+		rad1->key = val + 1;
+		radix_tree_insert(myRadixTree, rad1->key, rad1->val);
 		return 0;
 	}
 }
@@ -123,11 +134,10 @@ static void test_linked_list(void)
 	sprintf(structureValues, "%s", name);
 	for (node = rb_last(&(tree.root_node)); node; node = rb_prev(node))
 	{
-      		sprintf(structureValues + strlen(structureValues), "%d, ", rb_entry(node, struct rbEntry, run_node)->val);
+      	sprintf(structureValues + strlen(structureValues), "%d, ", rb_entry(node, struct rbEntry, run_node)->val);
 	}
 	printk(KERN_INFO "%s\n", structureValues);
 	strcpy(redBlackTree, structureValues);
-
 
 }
 
