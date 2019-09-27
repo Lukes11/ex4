@@ -51,7 +51,7 @@ struct radEntry {
 	int key;
 	int val;
 };
-static char linkedList[50], hashTable[50], redBlackTree[50];
+static char linkedList[50], hashTable[50], redBlackTree[50], radixTree[50];
 //function to insert a value into the rb tree
 static void rb_insert_entry(struct my_rb_tree *root, struct rbEntry *en)
 {
@@ -150,6 +150,7 @@ static void test_linked_list(void)
 		sprintf(structureValues + strlen(structureValues), "%d, ", *(int *) radVal);
 	}
 	printk(KERN_INFO "%s\n", structureValues);
+	strcpy(radixTree, structureValues);
 
 
 }
@@ -162,6 +163,8 @@ static void destroy_linked_list_and_free(void)
 	struct hashEntry *current_hash_entry;
 	struct rb_node *node;
 	int bkt;
+	void **slot;
+	struct radix_tree_iter iter;
 	//delete linked list
 	list_for_each_entry_safe(current_entry, next, &mylist, list) 
 	{
@@ -178,6 +181,12 @@ static void destroy_linked_list_and_free(void)
 	{
 		rb_erase(node, &(tree.root_node));
 	}
+	//delete radix tree
+	radix_tree_for_each_slot(slot, &myRadixTree, &iter, 0)
+	{
+		radix_tree_delete(&myRadixTree, iter.index);
+	}
+	
 
 
 }
@@ -230,7 +239,7 @@ static void cleanup(void)
 
 //Create proc entry
 static int structures_proc_show(struct seq_file *m, void *v) {
-	seq_printf(m, "%s\n%s\n%s\n", linkedList, hashTable, redBlackTree);
+	seq_printf(m, "%s\n%s\n%s\n%s\n", linkedList, hashTable, redBlackTree, radixTree);
 	return 0;
 }
 
