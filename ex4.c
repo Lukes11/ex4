@@ -57,8 +57,7 @@ static void test_linked_list(void)
 	struct entry  *current_entry;
 	char structureValues[50];
 	char name[20] = "Linked List: ";
-
-	int bkt; //hash bucket iterator
+	int bkt; 
 	struct hashEntry *current_hash_entry;
 
 	sprintf(structureValues, "%s", name);
@@ -86,10 +85,18 @@ static void destroy_linked_list_and_free(void)
 {
 	
 	struct entry *current_entry, *next;
+	struct hashEntry *current_hash_entry;
+	int bkt;
+	//delete linked list
 	list_for_each_entry_safe(current_entry, next, &mylist, list) 
         {
  		list_del(&current_entry->list);
  		kfree(current_entry); 
+	}
+	//delete hash table
+	hash_for_each(myHashTable, bkt, current_hash_entry, hash_list)
+	{
+		hash_del(&current_hash_entry->hash_list);
 	}
 
 }
@@ -182,8 +189,8 @@ out:
 
 static void __exit ex4_exit(void)
 {
-	return;
 	remove_proc_entry("structures_proc", NULL);
+	return;
 }
 
 //exit module
