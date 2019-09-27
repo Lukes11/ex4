@@ -103,7 +103,7 @@ static int store_value(int val)
 		rad1->key = val + 1;
 		radix_tree_insert(&myRadixTree, rad1->key, &rad1->val);
 		//add to XArray
-		xa_store(&myXArray, xArrIndex, &val);
+		xa_store(&myXArray, xArrIndex, &val, GFP_KERNEL);
 		return 0;
 	}
 }
@@ -119,6 +119,7 @@ static void test_linked_list(void)
 	struct rb_node *node;
 	void **slot;
 	struct radix_tree_iter iter;
+	int i;
 
 	//get string for linked list
 	sprintf(structureValues, "%s", name);
@@ -165,7 +166,7 @@ static void test_linked_list(void)
 	sprintf(structureValues, "%s", name);
 	for(i = 0; i < xArrIndex; i++)
 	{
-		sprintf(structureValues + strlen(structureValues), "%d, ", xa_load(&myXArray, i);	
+		sprintf(structureValues + strlen(structureValues), "%d, ", *(int *)xa_load(&myXArray, i));	
 	}
 	printk(KERN_INFO "%s\n", structureValues);
 
