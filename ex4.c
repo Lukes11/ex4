@@ -26,7 +26,9 @@ static DEFINE_HASHTABLE(myHashTable, 5);
 struct my_rb_tree {
 	struct rb_root root_node;
 }
-my_rb_tree->root_node = RB_ROOT;
+
+static struct my_rb_tree *tree = kmalloc(sizeof(tree), GFP_KERNEL);
+tree->root_node = RB_ROOT;
 
 //list entry
 struct entry {
@@ -48,6 +50,7 @@ static int store_value(int val)
 { 
 	struct entry *le1 = kmalloc(sizeof(*le1), GFP_KERNEL);
 	struct hashEntry *he1 = kmalloc(sizeof(*he1), GFP_KERNEL);
+	struct rbEntry *rb1 =  kmalloc(sizeof(*rb1), GFP_KERNEL);
 	//add to linked list
 	if(le1 == NULL || he1 == NULL)
 	{
@@ -58,29 +61,30 @@ static int store_value(int val)
 		le1->val = val;
 		list_add_tail(&le1->list, &mylist);
 		he1->val = val;
-		hash_add(myHashTable, &he1->hash_list, he1->val); 
-
+		hash_add(myHashTable, &he1->hash_list, he1->val);
+		rb1->val = val;
+		rb_insert(tree, rbEntry); 
 		return 0;
 	}
 }
+
 //function to insert a value into the rb tree
 static void rb_insert(struct my_rb_tree *root, struct rbEntry *en)
 {
 	struct rb_node **link = &my_rb_tree->root_node.rb_node;
 	struct rb_node *parent = NULL;
 	struct hashEntry *entry;
-
 	while(*link)
 	{
 		parent = *link;
 		entry = rb_entry(parent, struct rbEntry, run_node);
-		if(en->val > entry.val)
-			link = &(*link)->rb_left;
+		if(en->val > entry->val)
+			link = &parent->rb_left;
 		else
-			link = &(*link)->rb_right;
+			link = &parent->rb_right;
 	}
-	rb_link_node(en, parent, link);
-	rb_insert_color(en, root);
+	rb_link_node(&en->run_node, parent, link);
+	rb_insert_color(&en->run_node, &root->root_node);
 }
 
 static void test_linked_list(void)
@@ -199,12 +203,13 @@ static const struct file_operations structures_proc_fops = {
 static int __init ex4_init(void)
 {
 	int err = 0;
+	//create RB tree
 
 	if (!int_str) {
 		printk(KERN_INFO "Missing \'int_str\' parameter, exiting\n");
 		return -1;
 	}
-
+	
 	
 	err = parse_params();
 	if (err)
