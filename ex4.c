@@ -95,15 +95,17 @@ static void test_linked_list(void)
 	char name[20] = "Linked List: ";
 	int bkt; 
 	struct hashEntry *current_hash_entry;
+	struct rb_node *node;
 
+	//get string for linked list
 	sprintf(structureValues, "%s", name);
-
 	list_for_each_entry(current_entry, &mylist, list)
 	{
 		sprintf(structureValues + strlen(structureValues),"%d, ", current_entry->val);
 	}
 	printk(KERN_INFO "%s\n", structureValues);
 	strcpy(linkedList, structureValues);
+	//get string for hash table
 	strcpy(structureValues, "");
 	strcpy(name, "Hash Table: ");
 	sprintf(structureValues, "%s", name);
@@ -113,6 +115,17 @@ static void test_linked_list(void)
 	}
 	printk(KERN_INFO "%s\n", structureValues);
 	strcpy(hashTable, structureValues);
+	//get string for rb tree
+	strcpy(structureValues, "");
+	strcpy(name, "Red Black Tree: ");
+	sprintf(structureValues, "%s", name);
+	struct rb_node *node;
+	for (node = rb_first(&tree); node; node = rb_next(node))
+	{
+      sprintf(structureValues + strlen(structureValues), "%d, ", rb_entry(node, struct rbEntry, node)->val);
+	}
+	printk(KERN_INFO "%s\n", structureValues);
+
 
 }
 
