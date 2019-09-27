@@ -18,17 +18,30 @@ module_param(int_str, charp, S_IRUSR | S_IRGRP | S_IROTH);
 
 MODULE_PARM_DESC(int_str, "A comma-separated list of integers");
 
-
+//define list
 static LIST_HEAD(mylist);
+//define hash table
 static DEFINE_HASHTABLE(myHashTable, 5);
+//define red-black tree
+struct my_rb_tree {
+	struct rb_root root_node;
+}
+my_rb_tree->root_node = RB_ROOT;
 
+//list entry
 struct entry {
 	int val;
 	struct list_head list;
 };
+//hash table entry
 struct hashEntry {
 	int val;
 	struct hlist_node hash_list;
+};
+//reb black tree entry
+struct rbEntry {
+	int val;
+	struct rb_node run_node;
 };
 static char linkedList[50], hashTable[50];
 static int store_value(int val)
@@ -49,6 +62,25 @@ static int store_value(int val)
 
 		return 0;
 	}
+}
+//function to insert a value into the rb tree
+static void rb_insert(struct my_rb_tree *root, struct rbEntry *en)
+{
+	struct rb_node **link = &my_rb_tree->root_node.rb_node;
+	struct rb_node *parent = NULL;
+	struct hashEntry *entry;
+
+	while(*link)
+	{
+		parent = *link;
+		entry = rb_entry(parent, struct rbEntry, run_node);
+		if(en->val > entry.val)
+			link = &(*link)->rb_left;
+		else
+			link = &(*link)->rb_right;
+	}
+	rb_link_node(en, parent, link);
+	rb_insert_color(en, root);
 }
 
 static void test_linked_list(void)
