@@ -44,7 +44,7 @@ struct rbEntry {
 	int val;
 	struct rb_node run_node;
 };
-static char linkedList[50], hashTable[50];
+static char linkedList[50], hashTable[50], redBlackTree[50];
 //function to insert a value into the rb tree
 static void rb_insert_entry(struct my_rb_tree *root, struct rbEntry *en)
 {
@@ -69,17 +69,19 @@ static int store_value(int val)
 	struct entry *le1 = kmalloc(sizeof(*le1), GFP_KERNEL);
 	struct hashEntry *he1 = kmalloc(sizeof(*he1), GFP_KERNEL);
 	struct rbEntry *rb1 =  kmalloc(sizeof(*rb1), GFP_KERNEL);
-	//add to linked list
-	if(le1 == NULL || he1 == NULL)
+	if(le1 == NULL || he1 == NULL || rb1 == NULL)
 	{
 		return ENOMEM;
 	}
 	else 
 	{
+		//add to linked list
 		le1->val = val;
 		list_add_tail(&le1->list, &mylist);
+		//add to hash table
 		he1->val = val;
 		hash_add(myHashTable, &he1->hash_list, he1->val);
+		//add to red black tree
 		rb1->val = val;
 		rb_insert_entry(&tree, rb1); 
 
@@ -119,12 +121,12 @@ static void test_linked_list(void)
 	strcpy(structureValues, "");
 	strcpy(name, "Red Black Tree: ");
 	sprintf(structureValues, "%s", name);
-	struct rb_node *node;
-	for (node = rb_first(&tree); node; node = rb_next(node))
+	for (node = rb_last(&(tree.root_node)); node; node = rb_prev(node))
 	{
-      sprintf(structureValues + strlen(structureValues), "%d, ", rb_entry(node, struct rbEntry, node)->val);
+      		sprintf(structureValues + strlen(structureValues), "%d, ", rb_entry(node, struct rbEntry, run_node)->val);
 	}
 	printk(KERN_INFO "%s\n", structureValues);
+	strcpy(redBlackTree, structureValues);
 
 
 }
@@ -198,7 +200,7 @@ static void cleanup(void)
 
 //Create proc entry
 static int structures_proc_show(struct seq_file *m, void *v) {
-  seq_printf(m, "%s\n%s\n", linkedList, hashTable);
+  seq_printf(m, "%s\n%s\n%s\n", linkedList, hashTable, redBlackTree);
   return 0;
 }
 
