@@ -102,7 +102,7 @@ static int store_value(int val)
 		rad1->val = val;
 		rad1->key = val + 1;
 		radix_tree_insert(&myRadixTree, rad1->key, &rad1->val);
-		//add to XArray
+		//add too XArray
 		xa_store(&myXArray, xArrIndex, &val, GFP_KERNEL);
 		xArrIndex++;
 		return 0;
