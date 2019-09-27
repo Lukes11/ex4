@@ -25,10 +25,9 @@ static DEFINE_HASHTABLE(myHashTable, 5);
 //define red-black tree
 struct my_rb_tree {
 	struct rb_root root_node;
-}
+};
 
-static struct my_rb_tree *tree = kmalloc(sizeof(tree), GFP_KERNEL);
-tree->root_node = RB_ROOT;
+static struct my_rb_tree tree;
 
 //list entry
 struct entry {
@@ -63,13 +62,13 @@ static int store_value(int val)
 		he1->val = val;
 		hash_add(myHashTable, &he1->hash_list, he1->val);
 		rb1->val = val;
-		rb_insert(tree, rbEntry); 
+		rb_insert_entry(tree, rbEntry); 
 		return 0;
 	}
 }
 
 //function to insert a value into the rb tree
-static void rb_insert(struct my_rb_tree *root, struct rbEntry *en)
+static void rb_insert_entry(struct my_rb_tree *root, struct rbEntry *en)
 {
 	struct rb_node **link = &my_rb_tree->root_node.rb_node;
 	struct rb_node *parent = NULL;
@@ -204,7 +203,7 @@ static int __init ex4_init(void)
 {
 	int err = 0;
 	//create RB tree
-
+	tree.run_node = RB_ROOT;
 	if (!int_str) {
 		printk(KERN_INFO "Missing \'int_str\' parameter, exiting\n");
 		return -1;
