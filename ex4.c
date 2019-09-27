@@ -104,6 +104,7 @@ static int store_value(int val)
 		radix_tree_insert(&myRadixTree, rad1->key, &rad1->val);
 		//add to XArray
 		xa_store(&myXArray, xArrIndex, &val, GFP_KERNEL);
+		xArrIndex++;
 		return 0;
 	}
 }
