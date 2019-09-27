@@ -45,6 +45,25 @@ struct rbEntry {
 	struct rb_node run_node;
 };
 static char linkedList[50], hashTable[50];
+//function to insert a value into the rb tree
+static void rb_insert_entry(struct my_rb_tree *root, struct rbEntry *en)
+{
+	struct rb_node **link = &root->root_node.rb_node;
+	struct rb_node *parent = NULL;
+	struct rbEntry *entry;
+	while(*link)
+	{
+		parent = *link;
+		entry = rb_entry(parent, struct rbEntry, run_node);
+		if(en->val > entry->val)
+			link = &parent->rb_left;
+		else
+			link = &parent->rb_right;
+	}
+	rb_link_node(&en->run_node, parent, link);
+	rb_insert_color(&en->run_node, &root->root_node);
+}
+
 static int store_value(int val)
 { 
 	struct entry *le1 = kmalloc(sizeof(*le1), GFP_KERNEL);
@@ -62,28 +81,9 @@ static int store_value(int val)
 		he1->val = val;
 		hash_add(myHashTable, &he1->hash_list, he1->val);
 		rb1->val = val;
-		rb_insert_entry(tree, rbEntry); 
+		rb_insert_entry(tree, rb1); 
 		return 0;
 	}
-}
-
-//function to insert a value into the rb tree
-static void rb_insert_entry(struct my_rb_tree *root, struct rbEntry *en)
-{
-	struct rb_node **link = &my_rb_tree->root_node.rb_node;
-	struct rb_node *parent = NULL;
-	struct hashEntry *entry;
-	while(*link)
-	{
-		parent = *link;
-		entry = rb_entry(parent, struct rbEntry, run_node);
-		if(en->val > entry->val)
-			link = &parent->rb_left;
-		else
-			link = &parent->rb_right;
-	}
-	rb_link_node(&en->run_node, parent, link);
-	rb_insert_color(&en->run_node, &root->root_node);
 }
 
 static void test_linked_list(void)
@@ -203,7 +203,7 @@ static int __init ex4_init(void)
 {
 	int err = 0;
 	//create RB tree
-	tree.run_node = RB_ROOT;
+	tree.root_node = RB_ROOT;
 	if (!int_str) {
 		printk(KERN_INFO "Missing \'int_str\' parameter, exiting\n");
 		return -1;
