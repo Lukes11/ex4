@@ -50,7 +50,7 @@ struct rbEntry {
 struct radEntry {
 	int key;
 	int val;
-}
+};
 static char linkedList[50], hashTable[50], redBlackTree[50];
 //function to insert a value into the rb tree
 static void rb_insert_entry(struct my_rb_tree *root, struct rbEntry *en)
@@ -95,7 +95,7 @@ static int store_value(int val)
 		//add to radix tree
 		rad1->val = val;
 		rad1->key = val + 1;
-		radix_tree_insert(myRadixTree, rad1->key, rad1->val);
+		radix_tree_insert(&myRadixTree, rad1->key, &rad1->val);
 		return 0;
 	}
 }
